@@ -1,4 +1,4 @@
-<template>
+<!--template>
     <div class="jumbotron">
         <div class="container">
             <div class="row">
@@ -9,9 +9,32 @@
             </div>
         </div>
     </div>
+</template-->
+<template>
+  <div id="app">
+    <real-world-header />
+    <router-view></router-view>
+    <!--real-world-footer /-->
+  </div>
 </template>
 
 <script>
+import RealWorldHeader from '../components/Header';
+//import RealWorldFooter from '@/components/Footer';
+
+
+export default {
+  name: 'app',
+  components: {
+    RealWorldHeader, /*RealWorldFooter,*/
+  },
+};
+</script>
+
+<style>
+</style>
+
+<!--script>
 //import { mapState, mapActions } from 'vuex'
 
 export default {
@@ -33,4 +56,4 @@ export default {
         }
     } 
 };
-</script>
+</script-->
