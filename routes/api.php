@@ -13,7 +13,24 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-Route::post('register', 'Auth\RegisterController@register');
+/* 
+| ==========================
+|  Authenticate Routes
+| ==========================
+*/
+
+
+Route::get('/register','AuthController@resgisterShow')->name('registerr');
+Route::post('/register','AuthController@resgisterStore');
+Route::get('/login','AuthController@loginShow')->name('login');
+Route::post('/login','AuthController@loginStore');
+Route::post('/logout','AuthController@logout')->name('logout');
+Route::get('/verify/{token}','AuthController@verify')->name('verify');
+Route::get('/verify-again','AuthController@verifyAgain')->name('verifyAgain');
+Route::post('/verify-again','AuthController@resendVerification');
+
+
+//Route::post('register', 'Auth\RegisterController@register');
 
 /*
 Route::middleware('auth:api')->get('/user', function (Request $request) {

@@ -17,7 +17,7 @@ Route::get('/', function () {
     return view('main');
 });
 
-Auth::routes();
+//Auth::routes();
 /*
 Auth::routes(); equivalent 
 // Authentication Routes...
