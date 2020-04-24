@@ -26,40 +26,25 @@ class AuthController extends Controller
         return view('frontend.auth.register');
     }
 
-    // Register Store
-
     public function resgisterStore(Request $request){
 
         $validator = Validator::make($request->all(),[
-            'email' => 'required|email',
-            'password' => 'required|min:6|confirmed',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|min:6',
+            'passwordConfirm' => 'required|same:password'
         ]);
 
         if($validator->fails()){
-
-            return redirect()->back()->withErrors($validator);
+            return response()->json(['status' => 'error', 'message' => $validator->errors()]);
         }
 
-
-        $token = str_random(10);
-
         $user = User::create([
-            'name' => $request->name,
+            'name' => $request->username,
             'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'email_verification_token' => $token,
+            'password' => Hash::make($request->password)
         ]);
 
-        $user->notify(new VerifyMail($user));
-        
-        Session::flash('type','success');
-        Session::flash('message','Your Registration successfull,Activation link have been sent');
-
-        return redirect()->route('login');
-
-        
-
-
+        return response()->json(['status' => 'success', 'message' => 'user registered successfully']);
     }
 
     // Email Verification
