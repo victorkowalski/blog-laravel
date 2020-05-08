@@ -32,12 +32,17 @@ class AuthController extends Controller
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:1',
+            'password' => 'required|min:1',//'required|min:11',
             'passwordConfirm' => 'required|same:password',
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['status' => 'error', 'message' => $validator->errors()]);
+            $messages = [];
+            
+            foreach ($validator->errors()->all() as $message) {
+                $messages[] = $message;
+            }
+            return response()->json(['status' => 'error', 'message' => $messages]);
         }
 
         $user = User::create([
