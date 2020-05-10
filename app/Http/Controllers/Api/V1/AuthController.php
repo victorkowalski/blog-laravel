@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
 use App\Models\AccessToken;
 use App\Models\User;
@@ -12,22 +12,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\Controller;
 
 class AuthController extends Controller
 {
-    // Show register page
-    /*
-    public function resgisterShow()
-    {
-
-    if (auth()->user()) {
-
-    return redirect()->route('dashboard');
-    }
-
-    return view('frontend.auth.register');
-    }
-     */
     public function resgisterStore(Request $request)
     {
 
@@ -186,7 +174,7 @@ return redirect()->route('verifyAgain');
             if(!$validAccessToken )
                 $this->createNewAccessToken($user->id);
 
-            return response()->json(['status' => 'success', 'data' => $this->getUserWithAccessToken($user->email)]);
+            return response()->json(['status' => 'success', 'user' => $this->getUserWithAccessToken($user->email)]);
 
         }
 
