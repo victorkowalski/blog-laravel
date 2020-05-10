@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\AccessToken;
 use App\Models\User;
 use App\Notifications\PasswordResetNotify;
 use App\Notifications\VerifyMail;
@@ -15,30 +16,30 @@ use Illuminate\Support\Facades\Validator;
 class AuthController extends Controller
 {
     // Show register page
-
+    /*
     public function resgisterShow()
     {
 
-        if (auth()->user()) {
+    if (auth()->user()) {
 
-            return redirect()->route('dashboard');
-        }
-
-        return view('frontend.auth.register');
+    return redirect()->route('dashboard');
     }
 
+    return view('frontend.auth.register');
+    }
+     */
     public function resgisterStore(Request $request)
     {
 
         $validator = Validator::make($request->all(), [
             'email' => 'required|email|unique:users',
-            'password' => 'required|min:1',//'required|min:11',
+            'password' => 'required|min:1', //'required|min:11',
             'passwordConfirm' => 'required|same:password',
         ]);
 
         if ($validator->fails()) {
             $messages = [];
-            
+
             foreach ($validator->errors()->all() as $message) {
                 $messages[] = $message;
             }
@@ -161,9 +162,8 @@ class AuthController extends Controller
             'email' => $request->email,
             'password' => $request->password,
         ];
-
-        $user = User::where(
-            'email', $request->email)->first();
+        //with access token
+        $user = $this->getUserWithAccessToken($request->email);
 
         if (!$user) {
             return response()->json(['status' => 'error', 'message' => 'User not found']);
@@ -171,21 +171,59 @@ class AuthController extends Controller
 
         if (auth()->attempt($credentials)) {
 
-            $verified = auth()->user()->email_verified_at;
 /*
-            if ($verified == null) {
-                session()->flash('type', 'warning');
-                session()->flash('message', 'Your account is not verified');
-                auth()->logout();
-                return redirect()->route('verifyAgain');
+$verified = auth()->user()->email_verified_at;
 
-            }*/
+if ($verified == null) {
+session()->flash('type', 'warning');
+session()->flash('message', 'Your account is not verified');
+auth()->logout();
+return redirect()->route('verifyAgain');
 
-            return response()->json(['status' => 'success', 'data' => $user]);
+}*/
+            $validAccessToken = $this->getValidAccessToken($user->id);
+
+            if(!$validAccessToken )
+                $this->createNewAccessToken($user->id);
+
+            return response()->json(['status' => 'success', 'data' => $this->getUserWithAccessToken($user->email)]);
 
         }
 
-        return response()->json(['status' => 'error', 'message' => 'Invalid Credentials']);       
+        return response()->json(['status' => 'error', 'message' => 'Invalid Credentials']);
+    }
+
+    protected function getUserWithAccessToken($email)
+    {
+        return User::with('accessToken')->where(
+            'email', $email)->first();
+    }
+    protected function createNewAccessToken($userId)
+    {
+        $this->clearExpiredAccessTokens($userId);
+
+        $accessToken = new AccessToken();
+        $accessToken->user_id = $userId;
+
+        $temp = config('params.accessTokenExpireDays');
+        //$caclulatedTime = time() + 3600 * 24 * config('params.accessTokenExpireDays');
+        $expiredTime = Carbon::now()->addDays(config('params.accessTokenExpireDays'))->toDateTimeString();
+        $accessToken->generateToken($expiredTime);
+
+        return $accessToken->save() ? $accessToken : null;
+    }
+
+    protected function getValidAccessToken($userId)
+    {
+        $temp = AccessToken::where('user_id', $userId)
+            ->where('expired_at', '>', Carbon::now())
+            ->first();
+        return $temp;
+    }
+
+    protected function clearExpiredAccessTokens($userId)
+    {
+        AccessToken::where('user_id', $userId)->delete();
     }
 
     // Password Reset Token
@@ -301,9 +339,7 @@ class AuthController extends Controller
 
     public function logout()
     {
-
         auth()->logout();
         return redirect()->route('login');
     }
-
 }
