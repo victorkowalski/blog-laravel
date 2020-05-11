@@ -185,6 +185,7 @@ return redirect()->route('verifyAgain');
         return User::with('accessToken')->where(
             'email', $email)->first();
     }
+    
     protected function createNewAccessToken($userId)
     {
         $this->clearExpiredAccessTokens($userId);

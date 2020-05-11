@@ -15,11 +15,11 @@ class JwtMiddleware
         if(!$token) {
             // Unauthorized response if token not there
             return response()->json(['status' => 'error', 'message' => 'Token not provided']);
-            //return response()->json(['error' => 'Token not provided.'], 401);
         }
 
-        //$user = User::find($credentials->sub);
-        $user = User::where('remember_token', $token)->first();
+        $user = User::whereHas('accessToken', function($q) use ($token) {
+            $q->where('token', $token);
+         })->get();
 
         if(!$user) {
             // Unauthorized response if token not there
