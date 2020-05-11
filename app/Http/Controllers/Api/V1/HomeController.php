@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api\V1;
 
 use Illuminate\Http\Request;
 
@@ -23,11 +23,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
-    }
-
-    public function test()
-    {
-        return 'api';
+        return response()->json(['status' => 'success', 'message' => 'hello from backend api']);
     }
 }

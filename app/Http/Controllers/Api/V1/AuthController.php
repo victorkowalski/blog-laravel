@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\V1\Controller;
 
 class AuthController extends Controller
 {
@@ -136,7 +136,6 @@ class AuthController extends Controller
 
     public function loginStore(Request $request)
     {
-
         $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required',

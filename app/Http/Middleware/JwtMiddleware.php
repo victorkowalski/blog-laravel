@@ -10,13 +10,12 @@ class JwtMiddleware
 {
     public function handle($request, Closure $next, $guard = null)
     {
-        $token = $request->get('token');
+        $token = $request->bearerToken();
 
         if(!$token) {
             // Unauthorized response if token not there
-            return response()->json([
-                'error' => 'Token not provided.'
-            ], 401);
+            return response()->json(['status' => 'error', 'message' => 'Token not provided']);
+            //return response()->json(['error' => 'Token not provided.'], 401);
         }
 
         //$user = User::find($credentials->sub);
