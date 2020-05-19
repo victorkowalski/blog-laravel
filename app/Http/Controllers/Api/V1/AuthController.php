@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Session;
 use Illuminate\Support\Facades\Validator;
 use App\Http\Controllers\Api\V1\Controller;
+use Socialite;
 
 class AuthController extends Controller
 {
@@ -329,5 +330,13 @@ return redirect()->route('verifyAgain');
     {
         auth()->logout();
         return redirect()->route('login');
+    }
+
+    public function SocialSignup($provider)
+    {
+        // Socialite will pick response data automatic
+        $user = Socialite::driver($provider)->stateless()->user();
+
+        return response()->json($user);
     }
 }
